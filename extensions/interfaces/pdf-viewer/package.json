@@ -1,0 +1,37 @@
+{
+  "name": "pdf-viewer",
+  "description": "A Directus interface extension for previewing PDF files directly in the admin panel",
+  "icon": "picture_as_pdf",
+  "version": "1.0.0",
+  "keywords": [
+    "directus",
+    "directus-extension",
+    "directus-extension-interface",
+    "pdf",
+    "viewer",
+    "preview"
+  ],
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "directus:extension": {
+    "type": "interface",
+    "path": "dist/index.js",
+    "source": "src/index.js",
+    "host": "^10.10.0"
+  },
+  "scripts": {
+    "build": "directus-extension build",
+    "dev": "directus-extension build -w --no-minify",
+    "link": "directus-extension link",
+    "validate": "directus-extension validate"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^3.4.120"
+  },
+  "devDependencies": {
+    "@directus/extensions-sdk": "13.1.0",
+    "vue": "^3.5.14"
+  }
+}

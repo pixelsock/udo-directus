@@ -1,0 +1,61 @@
+{
+	"name": "google-to-html",
+	"description": "Please enter a description for your extension",
+	"icon": "extension",
+	"version": "1.0.0",
+	"keywords": [
+		"directus",
+		"directus-extension",
+		"directus-extension-bundle"
+	],
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"directus:extension": {
+		"type": "bundle",
+		"path": {
+			"app": "dist/app.js",
+			"api": "dist/api.js"
+		},
+		"entries": [
+			{
+				"type": "endpoint",
+				"name": "google-docs-to-html-endpoint",
+				"source": "src/google-docs-to-html-endpoint/index.ts"
+			},
+			{
+				"type": "module",
+				"name": "google-docs-to-html-module",
+				"source": "src/google-docs-to-html-module/index.ts"
+			},
+			{
+				"type": "layout",
+				"name": "google-docs-to-html-layout",
+				"source": "src/google-docs-to-html-layout/index.ts"
+			}
+		],
+		"host": "^10.10.0"
+	},
+	"scripts": {
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link",
+		"validate": "directus-extension validate",
+		"add": "directus-extension add"
+	},
+	"devDependencies": {
+		"@directus/extensions-sdk": "13.1.0",
+		"@types/node": "^22.15.17",
+		"typescript": "^5.8.3",
+		"vue": "^3.5.13"
+	},
+	"dependencies": {
+		"@tinymce/tinymce-vue": "^4.0.7",
+		"fs-extra": "^11.3.0",
+		"multer": "^1.4.5-lts.2",
+		"node-pandoc": "^0.3.0",
+		"temp": "^0.9.4",
+		"tinymce": "^7.8.0"
+	}
+}
