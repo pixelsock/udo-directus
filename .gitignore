@@ -1,3 +1,32 @@
+# Ignore Claude local settings
 **/.claude/settings.local.json
-node_modules
-node_modules
+
+# Environment files
+.env
+.env.*
+
+# Node dependencies
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS generated files
+.DS_Store
+
+# Editor directories and files
+.cursor/
+.windsurf/
+
+# Build output
+/dist/
+
+# Uploads and local files
+uploads/
+
+# Other
+.idea/
+.vscode/
+
