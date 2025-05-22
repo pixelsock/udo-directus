@@ -2,13 +2,11 @@ import { defineEndpoint } from '@directus/extensions-sdk';
 import { Request, Response } from 'express';
 import multer from 'multer';
 import pdfParse from 'pdf-parse';
-import { promises as fs } from 'fs';
-import path from 'path';
 import { DirectusServices } from './types/directus';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-export default defineEndpoint((router, { services, env, database }) => {
+export default defineEndpoint((router, { services, getSchema }) => {
   // Log when the extension is loaded
   console.log('PDF Extract endpoint registered');
   
@@ -45,7 +43,7 @@ export default defineEndpoint((router, { services, env, database }) => {
   // Handle file ID requests
   router.get('/:fileId', async (req: Request, res: Response) => {
     try {
-      const { FilesService } = services as DirectusServices;
+      const { FilesService, AssetsService } = services as DirectusServices;
       const fileId = req.params.fileId;
       
       // Validate fileId
@@ -58,10 +56,16 @@ export default defineEndpoint((router, { services, env, database }) => {
       
       console.log(`Processing PDF extraction for file ID: ${fileId}`);
       
-      // Create files service instance with proper accountability
-      const filesService = new FilesService({ 
-        knex: database,
-        accountability: req.accountability 
+      const schema = await getSchema();
+
+      // Create service instances with proper accountability
+      const filesService = new FilesService({
+        schema,
+        accountability: req.accountability
+      });
+      const assetsService = new AssetsService({
+        schema,
+        accountability: req.accountability
       });
       
       // Get file information
@@ -76,56 +80,15 @@ export default defineEndpoint((router, { services, env, database }) => {
       
       console.log(`Found file in database: ${file.filename_download}`);
       
-      // Try to get the file directly using the FilesService with stream option
-      let fileBuffer: Buffer | undefined;
-      
-      try {
-        // Use the readOne method with stream option to get the file contents directly
-        const fileStream = await filesService.readOne(fileId, { stream: true });
-        const chunks: Buffer[] = [];
-        
-        // Process the stream into a buffer
-        for await (const chunk of fileStream) {
-          chunks.push(Buffer.from(chunk));
-        }
-        
-        fileBuffer = Buffer.concat(chunks);
-        console.log(`Successfully retrieved file from Directus using stream API`);
-      } catch (streamError) {
-        console.error('Error getting file using stream API:', streamError);
-        
-        // Fallback to file system access if stream approach fails
-        const uploadsDir = env.PUBLIC_PATH || 'uploads';
-        
-        // Try multiple possible file paths
-        const possiblePaths = [
-          path.join(uploadsDir, fileId), 
-          path.join(uploadsDir, `${fileId}.pdf`),
-          path.join(uploadsDir, file.filename_download)
-        ];
-        
-        console.log(`Attempting to read file from possible paths: ${possiblePaths.join(', ')}`);
-        
-        // Try each path
-        let found = false;
-        for (const pathToTry of possiblePaths) {
-          try {
-            fileBuffer = await fs.readFile(pathToTry);
-            console.log(`Successfully read file from: ${pathToTry}`);
-            found = true;
-            break;
-          } catch (err) {
-            // Continue to next path
-          }
-        }
-        
-        if (!found) {
-          return res.status(404).json({ 
-            status: 'error', 
-            message: `Could not find PDF file in any of the expected locations` 
-          });
-        }
+      // Retrieve file using AssetsService
+      const { stream } = await assetsService.getAsset(fileId);
+      const chunks: Buffer[] = [];
+
+      for await (const chunk of stream) {
+        chunks.push(Buffer.from(chunk));
       }
+
+      const fileBuffer = Buffer.concat(chunks);
       
       if (!fileBuffer) {
         return res.status(404).json({
