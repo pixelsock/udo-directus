@@ -1,4 +1,3 @@
-import { Knex } from 'knex';
 
 // Extend Express Request interface to include Directus accountability
 declare global {
@@ -29,7 +28,10 @@ declare global {
 }
 
 export interface DirectusServices {
-  FilesService: new (options: { knex: Knex; accountability?: any }) => {
+  FilesService: new (options: { schema: any; accountability?: any }) => {
     readOne: (id: string, options?: { stream?: boolean }) => Promise<any>;
+  };
+  AssetsService: new (options: { schema: any; accountability?: any }) => {
+    getAsset: (id: string) => Promise<{ stream: NodeJS.ReadableStream }>;
   };
 }
