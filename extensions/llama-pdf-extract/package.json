@@ -6,7 +6,7 @@
   "keywords": [
     "directus",
     "directus-extension",
-    "directus-extension-endpoint"
+    "directus-extension-api"
   ],
   "type": "module",
   "files": [
@@ -14,11 +14,9 @@
   ],
   "directus:extension": {
     "type": "endpoint",
+    "path": "dist/index.js",
     "source": "src/index.ts",
-    "path": {
-      "api": "dist/index.js"
-    },
-    "host": "^10.10.0"
+    "host": "^11.7.0"
   },
   "scripts": {
     "build": "directus-extension build",
