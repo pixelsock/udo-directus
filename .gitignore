@@ -1,32 +1,37 @@
-# Ignore Claude local settings
-**/.claude/settings.local.json
+# Dependencies
+node_modules
+package-lock.json
+yarn.lock
 
-# Environment files
+# Build files
+dist
+.directus
+.cache
+
+# Environment variables
 .env
 .env.*
-
-# Node dependencies
-node_modules/
+!.env.example
 
 # Logs
+logs
+*.log
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# OS generated files
+# System files
 .DS_Store
+Thumbs.db
 
-# Editor directories and files
-.cursor/
-.windsurf/
+# Editors
+.idea
+.vscode
+*.swp
+*.swo
 
-# Build output
-/dist/
+# Generated files
+*.tsbuildinfo
+coverage
 
-# Uploads and local files
-uploads/
-
-# Other
-.idea/
-.vscode/
+# Upload directories
+/uploads/*/
 
