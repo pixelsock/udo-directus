@@ -1,0 +1,36 @@
+{
+	"name": "pdf-to-html-interface",
+	"type": "module",
+	"version": "1.0.0",
+	"description": "Convert PDF files to formatted HTML",
+	"author": "Charlotte UDO",
+	"license": "MIT",
+	"keywords": [
+		"pdf-convert",
+		"html-extract",
+		"directus",
+		"directus-extension",
+		"directus-extension-interface"
+	],
+	"icon": "transform",
+	"files": [
+		"dist"
+	],
+	"directus:extension": {
+		"type": "interface",
+		"path": "dist/index.js",
+		"source": "src/index.ts",
+		"host": "^10.10.0 || ^11.0.0"
+	},
+	"scripts": {
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link"
+	},
+	"devDependencies": {
+		"@directus/extensions-sdk": "^11.0.8",
+		"typescript": "^5.4.5",
+		"vue": "^3.4.27",
+		"vue-i18n": "^9.13.1"
+	}
+}
