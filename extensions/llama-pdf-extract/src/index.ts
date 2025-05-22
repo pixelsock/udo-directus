@@ -4,6 +4,7 @@ import multer from 'multer';
 import pdfParse from 'pdf-parse';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { DirectusServices } from './types/directus';
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -24,7 +25,7 @@ export default defineEndpoint((router, { services, env, database }) => {
       // Convert extracted text to basic HTML
       const htmlContent = convertTextToHtml(pdfData.text);
 
-      res.json({ 
+      return res.json({ 
         status: 'ok', 
         data: { 
           html: htmlContent,
@@ -37,15 +38,23 @@ export default defineEndpoint((router, { services, env, database }) => {
         } 
       });
     } catch (error: any) {
-      res.status(500).json({ status: 'error', message: error.message });
+      return res.status(500).json({ status: 'error', message: error.message });
     }
   });
   
   // Handle file ID requests
   router.get('/:fileId', async (req: Request, res: Response) => {
     try {
-      const { FilesService } = services;
+      const { FilesService } = services as DirectusServices;
       const fileId = req.params.fileId;
+      
+      // Validate fileId
+      if (!fileId) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'No file ID provided'
+        });
+      }
       
       console.log(`Processing PDF extraction for file ID: ${fileId}`);
       
@@ -68,7 +77,7 @@ export default defineEndpoint((router, { services, env, database }) => {
       console.log(`Found file in database: ${file.filename_download}`);
       
       // Try to get the file directly using the FilesService with stream option
-      let fileBuffer: Buffer;
+      let fileBuffer: Buffer | undefined;
       
       try {
         // Use the readOne method with stream option to get the file contents directly
@@ -118,6 +127,13 @@ export default defineEndpoint((router, { services, env, database }) => {
         }
       }
       
+      if (!fileBuffer) {
+        return res.status(404).json({
+          status: 'error',
+          message: 'Could not read PDF file content'
+        });
+      }
+      
       // Parse PDF content
       console.log(`Parsing PDF content with pdf-parse`);
       const pdfData = await pdfParse(fileBuffer);
@@ -126,7 +142,7 @@ export default defineEndpoint((router, { services, env, database }) => {
       const htmlContent = convertTextToHtml(pdfData.text);
       
       // Return response
-      res.json({
+      return res.json({
         status: 'ok',
         data: {
           html: htmlContent,
@@ -141,7 +157,7 @@ export default defineEndpoint((router, { services, env, database }) => {
       });
     } catch (error: any) {
       console.error('Error processing PDF by ID:', error);
-      res.status(500).json({ 
+      return res.status(500).json({ 
         status: 'error', 
         message: error.message,
         stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
