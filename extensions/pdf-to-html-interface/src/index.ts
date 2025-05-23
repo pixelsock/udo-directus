@@ -10,7 +10,7 @@ export default defineInterface({
 	types: ['alias'],
 	localTypes: ['presentation'],
 	group: 'presentation',
-	options: ({ collection }) => {
+	options: ({ collection }: { collection: string }) => {
 		return [
 			{
 				field: 'file_field',

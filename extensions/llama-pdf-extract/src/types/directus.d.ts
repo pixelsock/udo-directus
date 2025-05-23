@@ -28,10 +28,6 @@ declare global {
 }
 
 export interface DirectusServices {
-  FilesService: new (options: { schema: any; accountability?: any }) => {
-    readOne: (id: string, options?: { stream?: boolean }) => Promise<any>;
-  };
-  AssetsService: new (options: { schema: any; accountability?: any }) => {
-    getAsset: (id: string) => Promise<{ stream: NodeJS.ReadableStream }>;
-  };
+  FilesService: any;
+  AssetsService: any;
 }

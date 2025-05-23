@@ -1,0 +1,71 @@
+{
+	"name": "umodoc",
+	"description": "Umo Editor interface and display extensions for Directus",
+	"icon": "extension",
+	"version": "1.0.0",
+	"keywords": [
+		"directus",
+		"directus-extension",
+		"directus-extension-bundle"
+	],
+	"type": "module",
+	"files": [
+		"dist"
+	],
+	"directus:extension": {
+		"type": "bundle",
+		"path": {
+			"app": "dist/app.js",
+			"api": "dist/api.js"
+		},
+		"entries": [
+			{
+				"type": "interface",
+				"name": "umo-editor-interface",
+				"source": "src/interface/index.ts"
+			},
+			{
+				"type": "display",
+				"name": "umo-editor-display",
+				"source": "src/display/index.ts"
+			}
+		],
+		"host": "^10.10.0"
+	},
+	"scripts": {
+		"build": "directus-extension build",
+		"dev": "directus-extension build -w --no-minify",
+		"link": "directus-extension link",
+		"validate": "directus-extension validate",
+		"add": "directus-extension add"
+	},
+	"devDependencies": {
+		"@directus/extensions-sdk": "13.1.0",
+		"vue": "^3.5.14"
+	},
+	"dependencies": {
+		"@tiptap/core": "^2.12.0",
+		"@tiptap/extension-blockquote": "^2.12.0",
+		"@tiptap/extension-bold": "^2.12.0",
+		"@tiptap/extension-bullet-list": "^2.12.0",
+		"@tiptap/extension-code": "^2.12.0",
+		"@tiptap/extension-document": "^2.12.0",
+		"@tiptap/extension-dropcursor": "^2.12.0",
+		"@tiptap/extension-gapcursor": "^2.12.0",
+		"@tiptap/extension-heading": "^2.12.0",
+		"@tiptap/extension-horizontal-rule": "^2.12.0",
+		"@tiptap/extension-image": "^2.12.0",
+		"@tiptap/extension-italic": "^2.12.0",
+		"@tiptap/extension-link": "^2.12.0",
+		"@tiptap/extension-list-item": "^2.12.0",
+		"@tiptap/extension-ordered-list": "^2.12.0",
+		"@tiptap/extension-paragraph": "^2.12.0",
+		"@tiptap/extension-placeholder": "^2.12.0",
+		"@tiptap/extension-strike": "^2.12.0",
+		"@tiptap/extension-text": "^2.12.0",
+		"@tiptap/extension-underline": "^2.12.0",
+		"@tiptap/pm": "^2.12.0",
+		"@tiptap/vue-3": "^2.12.0",
+		"@umoteam/editor": "^6.1.1"
+	}
+}

@@ -38,6 +38,16 @@ function useSelectedFile() {
 	return { fileID, fileIsValid };
 }
 
+// Check if the selected file is a PDF
+const isPdfFile = computed(() => {
+	const fieldValues = inject('values', ref<Record<string, any>>({}));
+	if (!props.file_field || !fieldValues.value[props.file_field]) return false;
+	
+	// We can't easily check the file type here without additional API calls
+	// So we'll rely on the backend validation
+	return true;
+});
+
 async function convertPdfToHtml() {
 	if (!fileID.value) return;
 	
@@ -46,13 +56,31 @@ async function convertPdfToHtml() {
 	success.value = false;
 	
 	try {
-		// Call the PDF extraction endpoint
-		const response = await api.get(`/llama-pdf-extract/${fileID.value}`);
+		console.log('Converting PDF with file ID:', fileID.value);
+		
+		// Try several URL patterns to handle different configurations
+		let response;
+		try {
+			// First try the standard extensions path
+			console.log('Trying /extensions/llama-pdf-extract path...');
+			response = await api.get(`/extensions/llama-pdf-extract/${fileID.value}`);
+		} catch (err: any) {
+			if (err.response?.status === 404) {
+				// If not found, try without the extensions prefix
+				console.log('Trying /llama-pdf-extract path...');
+				response = await api.get(`/llama-pdf-extract/${fileID.value}`);
+			} else {
+				throw err;
+			}
+		}
+		
+		console.log('API response:', response);
 		
 		if (response.data?.data?.html) {
 			// If target field is specified, update it with the HTML
 			if (props.target_field && values.value) {
 				values.value[props.target_field] = response.data.data.html;
+				console.log(`Updated field ${props.target_field} with HTML content`);
 			}
 			
 			// Optional: copy to clipboard
@@ -65,11 +93,28 @@ async function convertPdfToHtml() {
 				success.value = !!props.target_field;
 			}
 		} else {
+			console.error('Invalid response structure:', response);
 			throw new Error('No HTML content received from conversion service');
 		}
 	} catch (err: any) {
 		console.error('Error converting PDF:', err);
-		error.value = err.message || 'Failed to convert PDF';
+		console.error('Error details:', {
+			message: err.message,
+			status: err.response?.status,
+			data: err.response?.data,
+			url: `/extensions/llama-pdf-extract/${fileID.value}`
+		});
+		
+		// Use the specific error message from the backend
+		if (err.response?.data?.message) {
+			error.value = err.response.data.message;
+		} else if (err.response?.status === 404) {
+			error.value = 'Please add a PDF file';
+		} else if (err.response?.status === 400) {
+			error.value = 'Invalid PDF file. Please select a valid PDF file.';
+		} else {
+			error.value = 'Failed to convert PDF. Please try again.';
+		}
 	} finally {
 		isLoading.value = false;
 		
@@ -86,12 +131,12 @@ async function convertPdfToHtml() {
 <template>
 	<div class="pdf-to-html-interface">
 		<v-button 
-			:disabled="!fileIsValid" 
+			:disabled="!fileIsValid || isLoading"
 			:loading="isLoading" 
 			@click="convertPdfToHtml"
 		>
 			<v-icon name="transform" left />
-			{{ t(button_label) }}
+			{{ fileIsValid ? t(button_label) : 'Please select a PDF file' }}
 		</v-button>
 		
 		<v-notice v-if="error" type="danger" class="notice">
