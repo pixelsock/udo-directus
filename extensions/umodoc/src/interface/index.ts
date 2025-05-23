@@ -64,7 +64,7 @@ export default defineInterface({
                     language: "json",
                     placeholder: `{
   "editorKey": "default",
-  "locale": "zh-CN",
+  "locale": "en-US",
   "theme": "light",
   "height": "400px",
   "document": {
@@ -73,7 +73,7 @@ export default defineInterface({
 }`,
                     template: JSON.stringify({
                         editorKey: "default",
-                        locale: "zh-CN",
+                        locale: "en-US",
                         theme: "light",
                         height: "400px",
                         document: {
