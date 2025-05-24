@@ -5,6 +5,21 @@
                 ref="editorRef"
                 v-bind="editorOptions"
             />
+            <!-- Image Bubble Menu -->
+            <ImageBubbleMenu
+                v-if="editorRef"
+                :editor="editorRef"
+            />
+            <!-- Floating Image Upload Button -->
+            <div class="floating-tools">
+                <ImageUploadButton
+                    v-if="editorRef"
+                    :editor="editorRef"
+                    title="Insert Image"
+                    icon="image"
+                    :disabled="props.disabled || props.readonly"
+                />
+            </div>
         </div>
         <div v-else class="umo-editor-readonly" v-html="displayContent"></div>
     </div>
@@ -14,6 +29,8 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import UmoEditor from '@umoteam/editor';
 import '@umoteam/editor/style';
+import ImageBubbleMenu from './components/ImageBubbleMenu.vue';
+import ImageUploadButton from './components/ImageUploadButton.vue';
 
 // Props
 interface Props {

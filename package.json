@@ -17,5 +17,17 @@
   "devDependencies": {
     "axios": "^1.9.0",
     "form-data": "^4.0.2"
-  }
+  },
+  "entries": [
+    {
+      "type": "interface",
+      "name": "interface",
+      "source": "src/interface/index.ts"
+    },
+    {
+      "type": "display",
+      "name": "display",
+      "source": "src/display/index.ts"
+    }
+  ]
 }
