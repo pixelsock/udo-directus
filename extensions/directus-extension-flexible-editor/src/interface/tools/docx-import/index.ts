@@ -1,14 +1,18 @@
-import DocxImport from '@custom-editor/docx-import';
-import { defineTool } from '../lib';
-import customMessages from '../i18n/custom-messages';
+import { defineTool } from '../../lib/define-tool';
+import customMessages from '../../i18n/custom-messages';
+import DocxImportButton from '../../components/DocxImportButton.vue';
 import type { Editor } from '@tiptap/core';
 
 export default defineTool({
     key: 'docxImport',
     name: customMessages.tools.docx_import,
-    icon: 'upload_file',
-    extension: [DocxImport],
-    action: (editor: Editor) => editor.chain().focus().docxImport().run(),
-    disabled: (editor: Editor) => !editor.can().chain().focus().docxImport().run(),
-    active: () => false,
+    icon: 'file_upload',
+    extension: [], // No TipTap extension needed, just functionality
+    excludeFromOptions: false,
+    toolbarButton: DocxImportButton,
+    action: (editor: Editor) => {
+        // Action will be handled by the custom toolbar button component
+    },
+    disabled: (editor: Editor) => false,
+    active: (editor: Editor) => false,
 });
