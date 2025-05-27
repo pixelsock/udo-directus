@@ -115,6 +115,7 @@
         "@tiptap/extension-text": "^2.6.6",
         "@tiptap/extension-text-align": "^2.6.6",
         "tiptap-extension-resize-image": "^1.2.2",
-        "tiptap-render-view": "^1.0.2"
+        "tiptap-render-view": "^1.0.2",
+        "@custom-editor/docx-import": "^1.0.0"
     }
 }
