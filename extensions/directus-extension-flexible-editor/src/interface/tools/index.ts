@@ -23,6 +23,7 @@ import blockquote from "./blockquote";
 import table from "./table";
 import fullscreen from "./fullscreen";
 import image from "./image";
+import docxImport from "./docx-import";
 import type { AnyExtension } from "@tiptap/core";
 import type { Tool, ToolSelection, InterfaceOption } from "../types";
 
@@ -54,6 +55,7 @@ const tools: Tool[] = [
     bulletList,
     orderedList,
     blockquote,
+    docxImport,
     table,
     history.undo,
     history.redo,

@@ -53,6 +53,7 @@ export default {
         ordered_list: "$t:wysiwyg_options.numlist",
         blockquote: "$t:wysiwyg_options.blockquote",
         image: "$t:wysiwyg_options.image",
+        docx_import: "Import DOCX",
         undo: "$t:wysiwyg_options.undo",
         redo: "$t:wysiwyg_options.redo",
         table: "$t:wysiwyg_options.table",
