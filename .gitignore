@@ -35,3 +35,19 @@ coverage
 # Upload directories
 /uploads/*/
 
+# Added by Claude Task Master
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+# Dependency directories
+node_modules/
+# Editor directories and files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+# Task files
+tasks.json
+tasks/ 

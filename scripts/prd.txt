@@ -1,0 +1,386 @@
+# Charlotte UDO (Unified Development Ordinance) System
+## Product Requirements Document (PRD)
+Version 1.0 | Date: 2024
+
+---
+
+## 1. Executive Summary
+
+The Charlotte UDO System is a comprehensive digital platform built on Directus CMS that manages and presents the Unified Development Ordinance for the City of Charlotte. The system provides advanced content management capabilities, rich text editing features, PDF viewing functionality, and sophisticated search capabilities to make city ordinances accessible and manageable.
+
+### Key Features
+- Advanced rich text editor with block-based content management
+- PDF document viewing and management
+- Flexible content relationships (M2A - Many to Any)
+- Word document import capabilities
+- Custom image management with advanced controls
+- Real-time content synchronization
+- Multi-format content display
+
+---
+
+## 2. System Architecture
+
+### 2.1 Technology Stack
+- **CMS Platform**: Directus (v10.x - v11.x compatible)
+- **Frontend Framework**: Vue 3 with TypeScript
+- **Editor Framework**: TipTap (ProseMirror-based)
+- **Build System**: Directus Extensions SDK
+- **Styling**: Tailwind CSS (for some components)
+- **Package Management**: npm/yarn/pnpm
+
+### 2.2 Extension Architecture
+The system is built as a collection of Directus extensions:
+
+1. **Flexible Editor Extension** (`directus-extension-flexible-editor`)
+   - Interface for rich content editing
+   - Display component for rendering content
+   - Content transformation utilities
+
+2. **PDF Viewer Extension** (`pdf-viewer-interface`)
+   - Interface for viewing PDF documents
+   - Integration with vue-pdf-embed
+
+3. **Custom Directus Configuration**
+   - Environment-specific settings
+   - Security policies (CSP directives)
+
+---
+
+## 3. Core Components
+
+### 3.1 Flexible Editor
+The heart of the content management system, providing Notion-like editing capabilities.
+
+#### Features:
+- **Block-Based Editing**: Paragraph, headings (H1-H6), lists, quotes, code blocks
+- **Rich Formatting**: Bold, italic, strikethrough, code, subscript, superscript
+- **Advanced Elements**: Tables, horizontal rules, links, images
+- **Relation Nodes**: 
+  - Relation Blocks (standalone content blocks)
+  - Relation Inline Blocks (inline within text)
+  - Relation Marks (applied to text selections)
+- **Slash Commands**: Quick insertion of elements via "/"
+- **Toolbar Modes**: Static, sticky, or floating
+- **Import Capabilities**: DOCX file import with image preservation
+- **Full-Screen Mode**: Distraction-free editing
+
+#### Technical Implementation:
+- Built on TipTap/ProseMirror
+- Custom node extensions for relation management
+- Vue 3 components for UI
+- JSON-based content storage
+- Real-time synchronization with M2A relations
+
+### 3.2 Image Management
+Advanced image handling with Directus integration.
+
+#### Features:
+- **Multiple Upload Methods**:
+  - Direct file upload
+  - URL insertion
+  - Directus file library selection
+- **Image Controls**:
+  - Size options (small 25%, medium 50%, large 75%, full 100%, original)
+  - Alignment (left, center, right)
+  - Caption support with inline editing
+  - Link attachment to images
+- **Automatic Asset Management**:
+  - Uploads to Directus assets
+  - Maintains file references
+  - Preserves metadata
+
+### 3.3 Document Import
+Sophisticated Word document import functionality.
+
+#### Features:
+- **DOCX Support**: Full document structure preservation
+- **Image Extraction**: Automatic extraction and upload of embedded images
+- **Format Preservation**: Maintains headings, lists, formatting
+- **Asset Management**: Uploads images to designated Directus folder
+- **Conversion Engine**: Mammoth.js integration
+
+### 3.4 PDF Viewer
+Integrated PDF viewing within the Directus interface.
+
+#### Features:
+- **In-Interface Viewing**: No need to download files
+- **Zoom Controls**: Fit to screen, full width options
+- **Navigation**: Page-by-page viewing
+- **Error Handling**: Graceful fallback for invalid PDFs
+
+---
+
+## 4. Data Models
+
+### 4.1 Content Structure
+```json
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "text": "Content text",
+          "marks": [
+            {
+              "type": "bold"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "relation-block",
+      "attrs": {
+        "id": "uuid",
+        "junction": "collection_name",
+        "collection": "target_collection"
+      }
+    }
+  ]
+}
+```
+
+### 4.2 Relation Node Structure
+- **Primary Key**: UUID type required
+- **Junction Collection**: Links content to related items
+- **Item Duplication Fields**: Required for copy/paste functionality
+- **Cascade Delete**: Automatic cleanup of orphaned relations
+
+### 4.3 Image Attributes
+```typescript
+{
+  src: string;
+  alt?: string;
+  title?: string;
+  width?: number;
+  height?: number;
+  size: 'small' | 'medium' | 'large' | 'full' | 'original';
+  alignment: 'left' | 'center' | 'right';
+  caption?: string;
+  link?: string;
+}
+```
+
+---
+
+## 5. User Interface
+
+### 5.1 Editor Interface
+- **Toolbar**: Customizable with tool selection
+- **Content Area**: WYSIWYG editing with real-time preview
+- **Slash Menu**: Context-sensitive command palette
+- **Relation Selectors**: Dropdown menus for available collections
+- **Status Indicators**: Loading states, validation warnings
+
+### 5.2 Display Options
+- **Plain Text**: Stripped formatting for previews
+- **Rich HTML**: Full formatting preservation
+- **Max Length**: Truncation support for list views
+- **Custom Styling**: Theme-aware color schemes
+
+### 5.3 Accessibility
+- **Keyboard Navigation**: Full keyboard support
+- **ARIA Labels**: Screen reader compatibility
+- **Focus Management**: Proper focus handling
+- **Contrast Compliance**: Theme-based contrast ratios
+
+---
+
+## 6. Configuration
+
+### 6.1 Interface Options
+```typescript
+{
+  m2aField: string;              // M2A reference field
+  relationBlocks: string[];      // Allowed block collections
+  relationInlineBlocks: string[]; // Allowed inline collections
+  relationMarks: string[];       // Allowed mark collections
+  placeholder: string;           // Editor placeholder text
+  tools: string[];              // Enabled editor tools
+  toolbarMode: 'static' | 'sticky' | 'floating';
+  displayFormat: boolean;        // Show format names
+  inputMode: 'multi' | 'single'; // Line mode
+  editorHeight: 'fixed' | 'grow' | 'grow-till-overflow';
+  font: 'sans-serif' | 'serif' | 'monospace';
+  spellcheck: boolean;
+}
+```
+
+### 6.2 Environment Variables
+```env
+# Required for PDF viewer
+CONTENT_SECURITY_POLICY_DIRECTIVES__SCRIPT_SRC=array:'self' data:
+
+# For Docker deployments
+CONTENT_SECURITY_POLICY_DIRECTIVES__SCRIPT_SRC: "array:'self' data:"
+```
+
+### 6.3 Extension Registration
+- Extensions must be installed in Directus extensions directory
+- Automatic discovery and registration
+- Hot-reload support in development
+
+---
+
+## 7. API Integration
+
+### 7.1 Directus API Usage
+- **File Upload**: `/files` endpoint for images and documents
+- **Asset Retrieval**: `/assets/{id}` for serving files
+- **Collection Management**: Standard Directus CRUD operations
+- **Relationship Handling**: M2A junction table management
+
+### 7.2 Content Serialization
+- **Storage Format**: JSON in database
+- **Display Format**: HTML generation from JSON
+- **Export Formats**: JSON, HTML, plain text
+
+---
+
+## 8. Security Considerations
+
+### 8.1 Content Security Policy
+- Script execution limited to self and data URIs
+- XSS prevention through content sanitization
+- CORS configuration for asset delivery
+
+### 8.2 File Upload Security
+- File type validation
+- Size limits enforcement
+- Malware scanning (if configured in Directus)
+- Access control through Directus permissions
+
+### 8.3 User Permissions
+- Role-based access control via Directus
+- Field-level permissions
+- Collection-level restrictions
+
+---
+
+## 9. Performance Optimization
+
+### 9.1 Editor Performance
+- Lazy loading of relation data
+- Debounced content saves
+- Efficient DOM manipulation via ProseMirror
+- Virtual scrolling for large documents
+
+### 9.2 Asset Management
+- Image optimization on upload
+- CDN integration capability
+- Caching strategies for static assets
+- Lazy loading of PDF pages
+
+---
+
+## 10. Browser Compatibility
+
+### 10.1 Supported Browsers
+- Chrome/Edge (latest 2 versions)
+- Firefox (latest 2 versions)
+- Safari (latest 2 versions)
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+### 10.2 Progressive Enhancement
+- Fallback for unsupported features
+- Graceful degradation for older browsers
+- Core functionality without JavaScript (read-only)
+
+---
+
+## 11. Internationalization
+
+### 11.1 Language Support
+- UI strings externalized in translation files
+- Support for Directus built-in translations
+- Custom message overrides
+- RTL language support (through Directus)
+
+### 11.2 Localization Features
+- Date/time formatting
+- Number formatting
+- Currency display (if applicable)
+
+---
+
+## 12. Future Enhancements
+
+### 12.1 Planned Features
+- Collaborative editing support
+- Version history with diff viewing
+- Advanced search within documents
+- AI-powered content suggestions
+- Export to multiple formats (PDF, DOCX)
+- Mobile app integration
+
+### 12.2 Technical Improvements
+- WebAssembly for performance-critical operations
+- Service worker for offline capability
+- Real-time collaboration via WebRTC
+- Enhanced accessibility features
+
+---
+
+## 13. Development Guidelines
+
+### 13.1 Code Standards
+- TypeScript for type safety
+- Vue 3 Composition API
+- ESLint configuration
+- Prettier formatting
+
+### 13.2 Testing Strategy
+- Unit tests for utilities
+- Component testing with Vue Test Utils
+- E2E testing with Cypress/Playwright
+- Performance benchmarking
+
+### 13.3 Deployment Process
+- Build extensions with Directus SDK
+- Version control with semantic versioning
+- Continuous integration pipeline
+- Staged rollout process
+
+---
+
+## 14. Support and Maintenance
+
+### 14.1 Documentation
+- User guides for content editors
+- Administrator documentation
+- Developer API documentation
+- Video tutorials
+
+### 14.2 Monitoring
+- Error tracking integration
+- Performance monitoring
+- Usage analytics
+- User feedback collection
+
+### 14.3 Update Policy
+- Security patches: Immediate
+- Bug fixes: Bi-weekly
+- Feature updates: Quarterly
+- Major versions: Annually
+
+---
+
+## 15. Appendices
+
+### A. Glossary
+- **UDO**: Unified Development Ordinance
+- **M2A**: Many-to-Any relationship
+- **CMS**: Content Management System
+- **WYSIWYG**: What You See Is What You Get
+
+### B. References
+- Directus Documentation: https://docs.directus.io
+- TipTap Documentation: https://tiptap.dev
+- Vue 3 Documentation: https://vuejs.org
+
+### C. Change Log
+- v1.0: Initial PRD creation
